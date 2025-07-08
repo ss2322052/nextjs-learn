@@ -1,18 +1,30 @@
+// src/app/ui/dashboard/revenue-chart.tsx
+
 import { generateYAxis } from '@/app/lib/utils';
 import { CalendarIcon } from '@heroicons/react/24/outline';
 import { lusitana } from '@/app/ui/fonts';
-import { Revenue } from '@/app/lib/definitions';
-import { fetchRevenue } from '@/app/lib/data';
+import { Revenue } from '@/app/lib/definitions'; // Revenueの型定義をインポート
+// import { fetchRevenue } from '@/app/lib/data'; // ★★★ ここは削除 ★★★
 
-export default async function RevenueChart() {
-  // コンポーネント自身がデータを取得
-  const revenue = await fetchRevenue();
-  
+// ★★★ 追加: RevenueChart コンポーネントが受け取るPropsの型定義 ★★★
+interface RevenueChartProps {
+  revenue: Revenue[]; // Revenue 型の配列を受け取ることを明示
+}
+
+// ★★★ 修正: propsとして revenue を受け取るように変更 ★★★
+export default function RevenueChart({ revenue }: RevenueChartProps) {
+  // const revenue = await fetchRevenue(); // ★★★ ここは削除 ★★★
+  // コンポーネントはもう自分でデータを取得しない
+
   const chartHeight = 350;
-  const { yAxisLabels, topLabel } = generateYAxis(revenue);
+  const { yAxisLabels, topLabel } = generateYAxis(revenue); // 渡された revenue を使う
 
   if (!revenue || revenue.length === 0) {
-    return <p className="mt-4 text-gray-400">No data available.</p>;
+    return (
+      <div className="flex w-full items-center justify-center h-[350px]">
+        <p className="mt-4 text-gray-400">No data available.</p>
+      </div>
+    );
   }
 
   return (
