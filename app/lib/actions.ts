@@ -1,3 +1,5 @@
+// app/lib/actions.ts
+
 'use server';
 
 import { z } from 'zod';
@@ -103,15 +105,17 @@ export async function updateInvoice(
   redirect('/dashboard/invoices');
 }
 
-
+// ★★★ ここを修正 ★★★
 export async function deleteInvoice(id: string) {
   try {
     await sql`DELETE FROM invoices WHERE id = ${id}`;
     revalidatePath('/dashboard/invoices');
-    return { message: 'Invoice deleted successfully.' };
+    // return { message: 'Invoice deleted successfully.' }; // ★削除または変更★
   } catch (error) {
     console.error('Database Error:', error);
-    return { message: 'Failed to delete invoice. Database error occurred.' };
+    // return { message: 'Failed to delete invoice. Database error occurred.' }; // ★削除または変更★
+    // エラー時には、throw new Error を使って、エラーを上位に伝えるのが一般的です
+    throw new Error('Failed to delete invoice.');
   }
 }
 
