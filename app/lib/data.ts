@@ -215,3 +215,44 @@ export async function fetchFilteredCustomers(query: string) {
     throw new Error('Failed to fetch customer table.');
   }
 }
+
+// ... (ファイルの既存の import とコード) ...
+
+// User インターフェースの定義 (もし definitions.ts になければここで定義)
+// definitions.ts に追加するのが望ましいですが、一時的にここに置くことも可能です。
+// 以下のパスに definitions.ts があることを確認してください: ./definitions
+// もし definitions.ts に User 型を追加する場合、この部分は削除し、
+// definitions.ts から User をインポートするように変更します。
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  password?: string; // パスワードは取得しないが、型定義上存在する可能性
+}
+
+export async function fetchUserByEmail(email: string) {
+  try {
+    // デバッグ用のログ (任意で追加・削除)
+    console.log('Attempting to fetch user data for email:', email);
+
+    // users テーブルから、指定されたメールアドレスに一致するユーザーのID、名前、メールアドレスを取得
+    const data = await sql<User[]>`
+      SELECT id, name, email FROM users WHERE email = ${email};
+    `;
+
+    if (data.length === 0) {
+      // ユーザーが見つからない場合
+      console.warn('User not found for email:', email); // デバッグ用
+      return null;
+    }
+
+    // 最初のユーザーを返す (メールアドレスは一意であることを前提)
+    return data[0];
+  } catch (error) {
+    // データベースエラーが発生した場合のハンドリング
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch user by email from database.');
+  }
+}
+
+// ... (ファイルの既存の export 関数群) ...
