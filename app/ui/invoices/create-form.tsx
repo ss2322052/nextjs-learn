@@ -9,15 +9,19 @@ import {
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import { Button } from '@/app/ui/button';
-import { createInvoice } from '@/app/lib/actions';
-import { useFormState } from 'react-dom';
+import { createInvoice, State } from '@/app/lib/actions'; 
+import { useActionState } from 'react';
 
 export default function Form({ customers }: { customers: CustomerField[] }) {
-  const initialState = { message: null, errors: {} };
-  const [state, dispatch] = useFormState(createInvoice, initialState);
+  // initialState をインポートした State 型で定義
+  const initialState: State = { message: null, errors: {} };
 
+  // useActionState フックを呼び出し
+  const [state, formAction] = useActionState(createInvoice, initialState);
+
+  // コンポーネントの唯一の return 文
   return (
-    <form action={dispatch}>
+    <form action={formAction}> {/* dispatch ではなく formAction を使用 */}
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
         {/* Customer Name */}
         <div className="mb-4">
@@ -35,6 +39,7 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
               <option value="" disabled>
                 Select a customer
               </option>
+              {/* 'customers' はこれで正しくスコープ内に入っています */}
               {customers.map((customer) => (
                 <option key={customer.id} value={customer.id}>
                   {customer.name}
@@ -44,6 +49,7 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
             <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
           </div>
           <div id="customer-error" aria-live="polite" aria-atomic="true">
+            {/* 'state' もこれで正しくスコープ内に入っています */}
             {state.errors?.customerId &&
               state.errors.customerId.map((error: string) => (
                 <p className="mt-2 text-sm text-red-500" key={error}>

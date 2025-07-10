@@ -1,5 +1,3 @@
-// app/lib/actions.ts
-
 'use server';
 
 import { z } from 'zod';
@@ -105,20 +103,26 @@ export async function updateInvoice(
   redirect('/dashboard/invoices');
 }
 
-// ★★★ ここを修正 ★★★
 export async function deleteInvoice(id: string) {
+  // 「use server」はファイルの先頭にあるので、ここには不要です。
+  // 'use server';
+
   try {
     await sql`DELETE FROM invoices WHERE id = ${id}`;
+    // 削除成功後、ダッシュボードの請求書リストを再検証します。
+    // これにより、削除された請求書がUIに表示されなくなります。
     revalidatePath('/dashboard/invoices');
-    // return { message: 'Invoice deleted successfully.' }; // ★削除または変更★
+    // 削除操作は、通常、現在のページを更新するだけで十分なため、
+    // ここで明示的にリダイレクトは不要な場合が多いです。
+    // もし削除後に特定のページへ遷移させたい場合は redirect() を追加します。
+    // 例: redirect('/dashboard/invoices');
   } catch (error) {
     console.error('Database Error:', error);
-    // return { message: 'Failed to delete invoice. Database error occurred.' }; // ★削除または変更★
-    // エラー時には、throw new Error を使って、エラーを上位に伝えるのが一般的です
+    // データベースエラーが発生した場合は、エラーをスローして呼び出し元に伝えます。
+    // これにより、呼び出し元でエラーを捕捉し、適切なエラーメッセージを表示できます。
     throw new Error('Failed to delete invoice.');
   }
 }
-
 
 export async function authenticate(
   prevState: string | undefined,
